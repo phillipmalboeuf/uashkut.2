@@ -23,3 +23,8 @@
 	--color-neutral: #222c55;
 	--color-neutral-content: #ffffff;
 }
+
+body {
+	background: linear-gradient(180deg, #000 0%, #362659 100%);
+	min-height: 100lvh;
+}
