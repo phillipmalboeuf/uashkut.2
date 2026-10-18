@@ -36,6 +36,9 @@
 			{#each images as image (image.id)}
 				<figure class="card overflow-hidden bg-base-200">
 					<img class="h-72 w-full object-cover" src={image.src} alt={image.alt} />
+					{#if image.caption}
+						<figcaption class="p-4 text-sm opacity-80">{image.caption}</figcaption>
+					{/if}
 				</figure>
 			{/each}
 		</div>
@@ -59,9 +62,12 @@
 			{/if}
 			<div {@attach carousel} class="carousel carousel-center w-full gap-4 rounded-box bg-base-200 p-4">
 				{#each images as image (image.id)}
-					<div class="carousel-item">
-						<img class="h-80 rounded-box object-cover" src={image.src} alt={image.alt} />
-					</div>
+					<figure class="carousel-item flex w-80 flex-col gap-3 sm:w-[28rem]">
+						<img class="h-80 w-full rounded-box bg-base-300 object-contain" src={image.src} alt={image.alt} />
+						{#if image.caption}
+							<figcaption class="text-sm opacity-80">{image.caption}</figcaption>
+						{/if}
+					</figure>
 				{/each}
 			</div>
 		</div>

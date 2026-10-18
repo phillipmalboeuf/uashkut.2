@@ -1,4 +1,4 @@
-import { createDirectus, readItems, rest, staticToken } from '@directus/sdk';
+import { createDirectus, readItems, readSingleton, rest, staticToken } from '@directus/sdk';
 import { DIRECTUS_TOKEN, DIRECTUS_URL } from '$app/env/private';
 
 export const directusUrl = DIRECTUS_URL;
@@ -22,6 +22,27 @@ const pageFields = [
 	'blocks.id',
 	'blocks.collection',
 	'blocks.sort',
+	'blocks.item:block_hero.status',
+	'blocks.item:block_hero.image_constraint',
+	'blocks.item:block_hero.image_max',
+	'blocks.item:block_hero.image.id',
+	'blocks.item:block_hero.image.title',
+	'blocks.item:block_hero.image.translations.languages_code',
+	'blocks.item:block_hero.image.translations.title',
+	'blocks.item:block_hero.translations.languages_code',
+	'blocks.item:block_hero.translations.content',
+	'blocks.item:block_hero.links.id',
+	'blocks.item:block_hero.links.sort',
+	'blocks.item:block_hero.links.type',
+	'blocks.item:block_hero.links.style',
+	'blocks.item:block_hero.links.url',
+	'blocks.item:block_hero.links.translations.languages_code',
+	'blocks.item:block_hero.links.translations.title',
+	'blocks.item:block_hero.links.page.slug',
+	'blocks.item:block_hero.links.page.is_index',
+	'blocks.item:block_hero.links.page.status',
+	'blocks.item:block_hero.links.page.translations.languages_code',
+	'blocks.item:block_hero.links.page.translations.title',
 	'blocks.item:block_richtext.status',
 	'blocks.item:block_richtext.translations.languages_code',
 	'blocks.item:block_richtext.translations.title',
@@ -35,8 +56,10 @@ const pageFields = [
 	'blocks.item:block_gallery.images.sort',
 	'blocks.item:block_gallery.images.directus_files_id.id',
 	'blocks.item:block_gallery.images.directus_files_id.title',
+	'blocks.item:block_gallery.images.directus_files_id.description',
 	'blocks.item:block_gallery.images.directus_files_id.translations.languages_code',
 	'blocks.item:block_gallery.images.directus_files_id.translations.title',
+	'blocks.item:block_gallery.images.directus_files_id.translations.description',
 	'blocks.item:block_video.status',
 	'blocks.item:block_video.source',
 	'blocks.item:block_video.embed_url',
@@ -70,7 +93,29 @@ const pageFields = [
 	'blocks.item:block_downloads.files.directus_files_id.filename_download',
 	'blocks.item:block_downloads.files.directus_files_id.translations.languages_code',
 	'blocks.item:block_downloads.files.directus_files_id.translations.title',
-	'blocks.item:block_downloads.files.directus_files_id.translations.description'
+	'blocks.item:block_downloads.files.directus_files_id.translations.description',
+	'blocks.item:block_image_map.status',
+	'blocks.item:block_image_map.image.id',
+	'blocks.item:block_image_map.image.title',
+	'blocks.item:block_image_map.image.width',
+	'blocks.item:block_image_map.image.height',
+	'blocks.item:block_image_map.image.translations.languages_code',
+	'blocks.item:block_image_map.image.translations.title',
+	'blocks.item:block_image_map.translations.languages_code',
+	'blocks.item:block_image_map.translations.title',
+	'blocks.item:block_image_map.translations.content',
+	'blocks.item:block_image_map.areas.id',
+	'blocks.item:block_image_map.areas.sort',
+	'blocks.item:block_image_map.areas.coords',
+	'blocks.item:block_image_map.areas.type',
+	'blocks.item:block_image_map.areas.url',
+	'blocks.item:block_image_map.areas.translations.languages_code',
+	'blocks.item:block_image_map.areas.translations.title',
+	'blocks.item:block_image_map.areas.page.slug',
+	'blocks.item:block_image_map.areas.page.is_index',
+	'blocks.item:block_image_map.areas.page.status',
+	'blocks.item:block_image_map.areas.page.translations.languages_code',
+	'blocks.item:block_image_map.areas.page.translations.title'
 ] as const;
 
 export type PageRecord = {
@@ -96,4 +141,45 @@ export async function readPages(filter: Record<string, unknown>): Promise<PageRe
 			limit: 1
 		})
 	) as Promise<PageRecord[]>;
+}
+
+const navigationFields = [
+	'links.id',
+	'links.sort',
+	'links.type',
+	'links.url',
+	'links.translations.languages_code',
+	'links.translations.title',
+	'links.page.slug',
+	'links.page.is_index',
+	'links.page.status',
+	'links.page.translations.languages_code',
+	'links.page.translations.title'
+] as const;
+
+type TitleTranslation = { languages_code: string | { code: string } | null; title: string | null };
+
+export type LinkRecord = {
+	id: string;
+	type: 'page' | 'external' | null;
+	url: string | null;
+	translations: TitleTranslation[] | null;
+	page: {
+		slug: string | null;
+		is_index: boolean;
+		status: string | null;
+		translations: TitleTranslation[] | null;
+	} | null;
+};
+
+export type NavigationLinkRecord = LinkRecord & { sort: number | null };
+
+export type NavigationRecord = {
+	links: NavigationLinkRecord[] | null;
+};
+
+export async function readNavigation(): Promise<NavigationRecord | null> {
+	return directus.request(
+		readSingleton('navigation', { fields: [...navigationFields] })
+	) as Promise<NavigationRecord | null>;
 }

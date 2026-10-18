@@ -3,7 +3,8 @@ import { isDirectusError } from '@directus/sdk';
 import { embedSrc } from '#lib/content/embed.ts';
 import { translatedField } from '#lib/content/text.ts';
 import type { PageBlock, PageContent } from '#lib/content/types.ts';
-import { assetUrl, readPages, type PageRecord, type RawBlock } from '#lib/server/directus.ts';
+import { assetUrl, readPages, type LinkRecord, type PageRecord, type RawBlock } from '#lib/server/directus.ts';
+import { toNavLink } from '#lib/server/links.ts';
 
 type TranslationRow = {
 	languages_code: string | { code: string } | null;
@@ -17,6 +18,8 @@ type FileRow = {
 	title?: string | null;
 	description?: string | null;
 	filename_download?: string | null;
+	width?: number | null;
+	height?: number | null;
 	translations?: TranslationRow[] | null;
 };
 
@@ -46,10 +49,44 @@ function copy(item: Record<string, unknown>, locale: string) {
 	};
 }
 
+function polygonPoints(coords: unknown): string | null {
+	if (typeof coords !== 'string') return null;
+	const values = coords.split(/[\s,]+/).filter(Boolean).map(Number);
+	if (values.length < 6 || values.length % 2 !== 0 || values.some((value) => !Number.isFinite(value))) return null;
+	const points: string[] = [];
+	for (let i = 0; i < values.length; i += 2) points.push(`${values[i]},${values[i + 1]}`);
+	return points.join(' ');
+}
+
 function mapBlock(block: RawBlock, locale: string): PageBlock | null {
 	if (!published(block.item) || !block.collection) return null;
 	const item = block.item;
 	const text = copy(item, locale);
+
+	if (block.collection === 'block_hero') {
+		const file = fileRow(item.image);
+		const links = sorted(
+			Array.isArray(item.links) ? (item.links as (LinkRecord & { sort?: number | null; style?: string })[]) : []
+		).flatMap((link) => {
+			const mapped = toNavLink(link, locale);
+			if (!mapped) return [];
+			return [{ ...mapped, style: link.style === 'outline' ? ('outline' as const) : ('primary' as const) }];
+		});
+		return {
+			id: block.id,
+			type: 'hero',
+			content: text.content,
+			image: file
+				? {
+						src: assetUrl(file.id, { width: '2000', format: 'webp' }),
+						alt: translatedField(file.translations, locale, 'title', file.title) ?? ''
+					}
+				: null,
+			imageConstraint: item.image_constraint === 'width' ? 'width' : 'height',
+			imageMax: typeof item.image_max === 'number' && item.image_max > 0 ? item.image_max : null,
+			links
+		};
+	}
 
 	if (block.collection === 'block_richtext') {
 		return { id: block.id, type: 'richtext', ...text };
@@ -65,7 +102,8 @@ function mapBlock(block: RawBlock, locale: string): PageBlock | null {
 				{
 					id: image.id,
 					src: assetUrl(file.id, { width: '1600', format: 'webp', fit: 'cover' }),
-					alt: translatedField(file.translations, locale, 'title', file.title) ?? ''
+					alt: translatedField(file.translations, locale, 'title', file.title) ?? '',
+					caption: translatedField(file.translations, locale, 'description', file.description)
 				}
 			];
 		});
@@ -136,6 +174,32 @@ function mapBlock(block: RawBlock, locale: string): PageBlock | null {
 			];
 		});
 		return { id: block.id, type: 'downloads', ...text, files };
+	}
+
+	if (block.collection === 'block_image_map') {
+		const file = fileRow(item.image);
+		const areas = sorted(
+			Array.isArray(item.areas) ? (item.areas as (LinkRecord & { sort?: number | null; coords?: unknown })[]) : []
+		).flatMap((area) => {
+			const points = polygonPoints(area.coords);
+			const mapped = points ? toNavLink(area, locale) : null;
+			return mapped && points ? [{ ...mapped, points }] : [];
+		});
+		return {
+			id: block.id,
+			type: 'imagemap',
+			...text,
+			image:
+				file && file.width && file.height
+					? {
+							src: assetUrl(file.id, { width: '2000', format: 'webp' }),
+							alt: translatedField(file.translations, locale, 'title', file.title) ?? '',
+							width: file.width,
+							height: file.height
+						}
+					: null,
+			areas
+		};
 	}
 
 	return null;

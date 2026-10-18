@@ -2,6 +2,7 @@ export type GalleryImage = {
 	id: string;
 	src: string;
 	alt: string;
+	caption: string | null;
 };
 
 export type IconItem = {
@@ -60,7 +61,44 @@ export type DownloadsBlock = {
 	files: DownloadFile[];
 };
 
-export type PageBlock = RichTextBlock | GalleryBlock | VideoBlock | IconListBlock | DownloadsBlock;
+export type NavLink = {
+	id: string;
+	href: string;
+	label: string;
+	external: boolean;
+};
+
+export type HeroLink = NavLink & { style: 'primary' | 'outline' };
+
+export type HeroBlock = {
+	id: string;
+	type: 'hero';
+	content: string | null;
+	image: { src: string; alt: string } | null;
+	imageConstraint: 'height' | 'width';
+	imageMax: number | null;
+	links: HeroLink[];
+};
+
+export type ImageMapArea = NavLink & { points: string };
+
+export type ImageMapBlock = {
+	id: string;
+	type: 'imagemap';
+	title: string | null;
+	content: string | null;
+	image: { src: string; alt: string; width: number; height: number } | null;
+	areas: ImageMapArea[];
+};
+
+export type PageBlock =
+	| HeroBlock
+	| RichTextBlock
+	| GalleryBlock
+	| VideoBlock
+	| IconListBlock
+	| DownloadsBlock
+	| ImageMapBlock;
 
 export type PageContent = {
 	id: string;
