@@ -1,0 +1,14 @@
+{
+	"mcpServers": {
+		"svelte": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@sveltejs/mcp"
+			]
+		},
+		"directus": {
+			"url": "https://uashkut.up.railway.app/mcp"
+		}
+	}
+}

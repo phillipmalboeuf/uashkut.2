@@ -1,0 +1,25 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+@plugin "daisyui" {
+	themes: dark --default;
+}
+@plugin "daisyui/theme" {
+	name: "dark";
+	default: true;
+	prefersdark: true;
+	color-scheme: "dark";
+
+	--color-base-100: #000000;
+	--color-base-200: #222c55;
+	--color-base-300: #362659;
+	--color-base-content: #ffffff;
+	--color-primary: #4eb7a1;
+	--color-primary-content: #000000;
+	--color-secondary: #362659;
+	--color-secondary-content: #ffffff;
+	--color-accent: #4eb7a1;
+	--color-accent-content: #000000;
+	--color-neutral: #222c55;
+	--color-neutral-content: #ffffff;
+}
