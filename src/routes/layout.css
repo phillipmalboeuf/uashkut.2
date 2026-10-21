@@ -11,20 +11,69 @@
 	color-scheme: "dark";
 
 	--color-base-100: #000000;
-	--color-base-200: #222c55;
+	--color-base-200: #362659;
 	--color-base-300: #362659;
 	--color-base-content: #ffffff;
-	--color-primary: #4eb7a1;
-	--color-primary-content: #000000;
-	--color-secondary: #362659;
+	--color-primary: #362659;
+	--color-primary-content: #ffffff;
+	--color-secondary: #4eb7a1;
 	--color-secondary-content: #ffffff;
 	--color-accent: #4eb7a1;
 	--color-accent-content: #000000;
-	--color-neutral: #222c55;
+	--color-neutral: #362659;
 	--color-neutral-content: #ffffff;
+}
+
+@font-face {
+	font-family: 'Espiritu';
+	src: url('/Espiritu-Regular.otf') format('opentype');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'PP Altera Text';
+	src: url('/PPAlteraText-Regular.otf') format('opentype');
+	font-weight: 100 500;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'PP Altera Text';
+	src: url('/PPAlteraText-Extrabold.otf') format('opentype');
+	font-weight: 600 900;
+	font-style: normal;
+	font-display: swap;
+}
+
+@theme {
+	--font-sans: 'PP Altera Text', ui-sans-serif, system-ui, sans-serif;
+	--font-heading: 'Espiritu', ui-serif, Georgia, serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.prose :where(h1, h2, h3, h4, h5, h6) {
+	font-family: var(--font-heading);
+	font-weight: 400;
 }
 
 body {
 	background: linear-gradient(180deg, #000 0%, #362659 100%);
 	min-height: 100lvh;
+}
+
+.btn {
+	font-family: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+	font-weight: 400;
+}
+
+.btn-primary {
+	z-index: 1;
 }

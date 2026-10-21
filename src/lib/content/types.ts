@@ -25,6 +25,7 @@ export type RichTextBlock = {
 	type: 'richtext';
 	title: string | null;
 	content: string | null;
+	centered: boolean;
 };
 
 export type GalleryBlock = {

@@ -19,7 +19,7 @@
 
 {#snippet items()}
 	{#each links as link (link.id)}
-		<li>
+		<li class="join-item btn btn-primary">
 			{#if link.external}
 				<a href={link.href} target="_blank" rel="noopener noreferrer">
 					{link.label}
@@ -28,7 +28,7 @@
 			{:else}
 				<a
 					href={resolve(localizeHref(link.href) as Path)}
-					class={{ 'menu-active': currentPath === link.href }}
+					class={['', { 'menu-active': currentPath === link.href }]}
 					aria-current={currentPath === link.href ? 'page' : undefined}
 				>{link.label}</a>
 			{/if}
@@ -36,7 +36,7 @@
 	{/each}
 {/snippet}
 
-<header class="navbar px-4">
+<header class="navbar px-4 fixed top-0 left-0 right-0 z-50">
 	<div class="navbar-start">
 		<div class="dropdown">
 			<div tabindex="0" role="button" class="btn btn-ghost lg:hidden" aria-label="Menu">
@@ -59,11 +59,11 @@
 				{@render items()}
 			</ul>
 		</div>
-		<a href={resolve(localizeHref('/') as Path)} class="btn btn-ghost text-xl">Uashkut</a>
+		<a href={resolve(localizeHref('/') as Path)} class="btn btn-ghost text-xl font-heading! uppercase">Uashkut</a>
 	</div>
 
 	<nav class="navbar-center hidden lg:flex">
-		<ul class="menu menu-horizontal px-1">
+		<ul class="join">
 			{@render items()}
 		</ul>
 	</nav>
@@ -71,7 +71,7 @@
 	<div class="navbar-end gap-2">
 		{#each locales as locale (locale)}
 			<a
-				class={['btn btn-sm', locale === getLocale() ? 'btn-primary' : 'btn-ghost']}
+				class={['btn btn-sm uppercase', locale === getLocale() ? 'btn-primary' : 'btn-ghost']}
 				href={resolve(localizeHref(page.url.pathname, { locale }) as Path)}
 				hreflang={locale}
 				onclick={(event) => {

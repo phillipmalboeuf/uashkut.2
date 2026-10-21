@@ -44,6 +44,7 @@ const pageFields = [
 	'blocks.item:block_hero.links.page.translations.languages_code',
 	'blocks.item:block_hero.links.page.translations.title',
 	'blocks.item:block_richtext.status',
+	'blocks.item:block_richtext.centered',
 	'blocks.item:block_richtext.translations.languages_code',
 	'blocks.item:block_richtext.translations.title',
 	'blocks.item:block_richtext.translations.content',

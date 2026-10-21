@@ -89,7 +89,7 @@ function mapBlock(block: RawBlock, locale: string): PageBlock | null {
 	}
 
 	if (block.collection === 'block_richtext') {
-		return { id: block.id, type: 'richtext', ...text };
+		return { id: block.id, type: 'richtext', ...text, centered: item.centered === true };
 	}
 
 	if (block.collection === 'block_gallery') {

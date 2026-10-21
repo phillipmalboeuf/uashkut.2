@@ -15,7 +15,7 @@
 	<title>{page.title}</title>
 </svelte:head>
 
-<main>
+<main class="overflow-clip">
 	{#each page.blocks as block (block.id)}
 		{#if block.type === 'hero'}
 			<Hero
@@ -26,7 +26,7 @@
 				links={block.links}
 			/>
 		{:else if block.type === 'richtext'}
-			<RichText title={block.title} content={block.content} />
+			<RichText title={block.title} content={block.content} centered={block.centered} />
 		{:else if block.type === 'gallery'}
 			<Gallery title={block.title} content={block.content} layout={block.layout} images={block.images} />
 		{:else if block.type === 'video'}
