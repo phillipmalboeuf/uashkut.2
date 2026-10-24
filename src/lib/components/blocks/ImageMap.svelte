@@ -6,11 +6,36 @@
 	import BlockSection from './BlockSection.svelte';
 
 	let { title, content, image, areas }: Pick<ImageMapBlock, 'title' | 'content' | 'image' | 'areas'> = $props();
+
+	function entryProgress(node: HTMLElement) {
+		if (CSS.supports('animation-timeline: view()')) return;
+
+		let frame = 0;
+		const update = () => {
+			frame = 0;
+			const { top, height } = node.getBoundingClientRect();
+			const viewport = window.innerHeight;
+			const progress = (viewport - top) / Math.min(height, viewport);
+			node.style.setProperty('--entry', String(Math.min(Math.max(progress, 0), 1)));
+		};
+		const schedule = () => {
+			frame ||= requestAnimationFrame(update);
+		};
+
+		update();
+		window.addEventListener('scroll', schedule, { passive: true });
+		window.addEventListener('resize', schedule);
+		return () => {
+			cancelAnimationFrame(frame);
+			window.removeEventListener('scroll', schedule);
+			window.removeEventListener('resize', schedule);
+		};
+	}
 </script>
 
 <BlockSection {title} {content}>
 	{#if image}
-		<div class="map mx-auto w-full">
+		<div class="map mx-auto w-full" {@attach entryProgress}>
 			<div class="map-scale relative">
 				<img class="block h-auto w-full" src={image.src} alt={image.alt} width={image.width} height={image.height} />
 				<svg class="absolute inset-0 size-full" viewBox="0 0 {image.width} {image.height}">
@@ -58,6 +83,14 @@
 					scale-out linear forwards;
 				animation-timeline: --map, --map;
 				animation-range: entry, exit;
+			}
+		}
+
+		/* --entry is set from script and mirrors the scale-in keyframes */
+		@supports not (animation-timeline: view()) {
+			.map-scale {
+				scale: calc(3 - 2 * var(--entry, 1));
+				transform-origin: top center;
 			}
 		}
 	}
