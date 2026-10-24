@@ -32,7 +32,7 @@
 	font-display: swap;
 }
 
-@font-face {
+/* @font-face {
 	font-family: 'PP Altera Text';
 	src: url('/PPAlteraText-Regular.otf') format('opentype');
 	font-weight: 100 500;
@@ -46,10 +46,10 @@
 	font-weight: 600 900;
 	font-style: normal;
 	font-display: swap;
-}
+} */
 
 @theme {
-	--font-sans: 'PP Altera Text', ui-sans-serif, system-ui, sans-serif;
+	--font-sans: ui-sans-serif, system-ui, sans-serif;
 	--font-heading: 'Espiritu', ui-serif, Georgia, serif;
 }
 
