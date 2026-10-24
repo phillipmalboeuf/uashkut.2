@@ -23,6 +23,8 @@
 				image={block.image}
 				imageConstraint={block.imageConstraint}
 				imageMax={block.imageMax}
+				background={block.background}
+				backgroundFade={block.backgroundFade}
 				links={block.links}
 			/>
 		{:else if block.type === 'richtext'}

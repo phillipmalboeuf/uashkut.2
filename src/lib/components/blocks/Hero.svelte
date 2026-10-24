@@ -4,6 +4,7 @@
 	import { localizeHref } from '#lib/paraglide/runtime.js';
 	import type { HeroBlock } from '#lib/content/types.ts';
 	import ExternalIcon from '../ExternalIcon.svelte';
+	import Image from '../Image.svelte';
 	import Prose from './Prose.svelte';
 
 	let {
@@ -11,22 +12,43 @@
 		image,
 		imageConstraint,
 		imageMax,
+		background,
+		backgroundFade,
 		links
-	}: Pick<HeroBlock, 'content' | 'image' | 'imageConstraint' | 'imageMax' | 'links'> = $props();
+	}: Pick<
+		HeroBlock,
+		'content' | 'image' | 'imageConstraint' | 'imageMax' | 'background' | 'backgroundFade' | 'links'
+	> = $props();
 
 	let maxHeight = $derived(imageConstraint === 'height' && imageMax ? `${imageMax}px` : undefined);
 	let maxWidth = $derived(imageConstraint === 'width' && imageMax ? `min(${imageMax}px, 100%)` : undefined);
+
+	let imageSizes = $derived.by(() => {
+		if (!imageMax) return '100vw';
+		if (imageConstraint === 'width') return `min(${imageMax}px, 100vw)`;
+		if (image?.width && image.height) return `min(${Math.round((imageMax * image.width) / image.height)}px, 100vw)`;
+		return '100vw';
+	});
 </script>
 
-<section class="flex min-h-screen flex-col items-center py-12">
+<section class="relative isolate flex min-h-screen flex-col items-center overflow-hidden py-12">
+	{#if background}
+		<Image
+			class={['absolute inset-0 -z-10 size-full object-cover', backgroundFade && 'mask-y-from-75%']}
+			image={background}
+			sizes="100vw"
+			loading="eager"
+			fetchpriority="high"
+		/>
+	{/if}
 	<div class="hero-content w-full flex-1 flex-col text-center">
 		{#if image}
-			<img
+			<Image
 				class="h-auto w-auto max-w-full rounded-box py-6"
-				src={image.src}
-				alt={image.alt}
-				style:max-height={maxHeight}
-				style:max-width={maxWidth}
+				{image}
+				sizes={imageSizes}
+				loading="eager"
+				style="max-height: {maxHeight ?? 'none'}; max-width: {maxWidth ?? '100%'}"
 			/>
 		{/if}
 		{#if content}

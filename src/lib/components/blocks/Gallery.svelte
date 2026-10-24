@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
 	import type { GalleryImage } from '#lib/content/types.ts';
+	import Image from '../Image.svelte';
 	import BlockSection from './BlockSection.svelte';
 
 	let {
@@ -35,7 +36,11 @@
 		<div class="grid gap-4 sm:grid-cols-2">
 			{#each images as image (image.id)}
 				<figure class="card overflow-hidden bg-base-200">
-					<img class="h-72 w-full object-cover" src={image.src} alt={image.alt} />
+					<Image
+						class="h-72 w-full object-cover"
+						image={image.image}
+						sizes="(min-width: 1024px) 496px, (min-width: 640px) 50vw, 100vw"
+					/>
 					{#if image.caption}
 						<figcaption class="p-4 text-sm opacity-80">{image.caption}</figcaption>
 					{/if}
@@ -63,7 +68,11 @@
 			<div {@attach carousel} class="carousel carousel-center w-full gap-4 rounded-box bg-base-200 p-4">
 				{#each images as image (image.id)}
 					<figure class="carousel-item flex w-80 flex-col gap-3 sm:w-[28rem]">
-						<img class="h-80 w-full rounded-box bg-base-300 object-contain" src={image.src} alt={image.alt} />
+						<Image
+							class="h-80 w-full rounded-box bg-base-300 object-contain"
+							image={image.image}
+							sizes="(min-width: 640px) 448px, 320px"
+						/>
 						{#if image.caption}
 							<figcaption class="text-sm opacity-80">{image.caption}</figcaption>
 						{/if}

@@ -2,7 +2,7 @@ import { error } from '@sveltejs/kit';
 import { isDirectusError } from '@directus/sdk';
 import { embedSrc } from '#lib/content/embed.ts';
 import { translatedField } from '#lib/content/text.ts';
-import type { PageBlock, PageContent } from '#lib/content/types.ts';
+import type { ImageAsset, PageBlock, PageContent } from '#lib/content/types.ts';
 import { assetUrl, readPages, type LinkRecord, type PageRecord, type RawBlock } from '#lib/server/directus.ts';
 import { toNavLink } from '#lib/server/links.ts';
 
@@ -20,6 +20,8 @@ type FileRow = {
 	filename_download?: string | null;
 	width?: number | null;
 	height?: number | null;
+	modified_on?: string | null;
+	type?: string | null;
 	translations?: TranslationRow[] | null;
 };
 
@@ -35,6 +37,18 @@ function fileRow(value: unknown): FileRow | null {
 	if (!value || typeof value !== 'object' || !('id' in value)) return null;
 	const file = value as FileRow;
 	return typeof file.id === 'string' ? file : null;
+}
+
+function imageAsset(file: FileRow, locale: string): ImageAsset {
+	const modified = file.modified_on ? Date.parse(file.modified_on) : NaN;
+	return {
+		id: file.id,
+		alt: translatedField(file.translations, locale, 'title', file.title) ?? '',
+		width: file.width ?? null,
+		height: file.height ?? null,
+		version: Number.isFinite(modified) ? modified.toString(36) : null,
+		vector: file.type === 'image/svg+xml'
+	};
 }
 
 function sorted<T extends { sort?: number | null }>(items: T[]): T[] {
@@ -65,6 +79,7 @@ function mapBlock(block: RawBlock, locale: string): PageBlock | null {
 
 	if (block.collection === 'block_hero') {
 		const file = fileRow(item.image);
+		const background = fileRow(item.background);
 		const links = sorted(
 			Array.isArray(item.links) ? (item.links as (LinkRecord & { sort?: number | null; style?: string })[]) : []
 		).flatMap((link) => {
@@ -76,14 +91,11 @@ function mapBlock(block: RawBlock, locale: string): PageBlock | null {
 			id: block.id,
 			type: 'hero',
 			content: text.content,
-			image: file
-				? {
-						src: assetUrl(file.id, { width: '2000', format: 'webp' }),
-						alt: translatedField(file.translations, locale, 'title', file.title) ?? ''
-					}
-				: null,
+			image: file ? imageAsset(file, locale) : null,
 			imageConstraint: item.image_constraint === 'width' ? 'width' : 'height',
 			imageMax: typeof item.image_max === 'number' && item.image_max > 0 ? item.image_max : null,
+			background: background ? imageAsset(background, locale) : null,
+			backgroundFade: item.background_fade !== false,
 			links
 		};
 	}
@@ -101,8 +113,7 @@ function mapBlock(block: RawBlock, locale: string): PageBlock | null {
 			return [
 				{
 					id: image.id,
-					src: assetUrl(file.id, { width: '1600', format: 'webp', fit: 'cover' }),
-					alt: translatedField(file.translations, locale, 'title', file.title) ?? '',
+					image: imageAsset(file, locale),
 					caption: translatedField(file.translations, locale, 'description', file.description)
 				}
 			];
@@ -145,8 +156,7 @@ function mapBlock(block: RawBlock, locale: string): PageBlock | null {
 			return [
 				{
 					id: icon.id,
-					src: file ? assetUrl(file.id, { width: '160', height: '160', fit: 'cover', format: 'webp' }) : null,
-					alt: translatedField(file?.translations, locale, 'title', file?.title) ?? '',
+					image: file ? imageAsset(file, locale) : null,
 					title: translatedField(rows, locale, 'title', null),
 					content: translatedField(rows, locale, 'content', null)
 				}
@@ -191,12 +201,7 @@ function mapBlock(block: RawBlock, locale: string): PageBlock | null {
 			...text,
 			image:
 				file && file.width && file.height
-					? {
-							src: assetUrl(file.id, { width: '2000', format: 'webp' }),
-							alt: translatedField(file.translations, locale, 'title', file.title) ?? '',
-							width: file.width,
-							height: file.height
-						}
+					? { ...imageAsset(file, locale), width: file.width, height: file.height }
 					: null,
 			areas
 		};

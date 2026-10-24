@@ -8,4 +8,5 @@ const handleParaglide: Handle = ({ event, resolve }) => paraglideMiddleware(even
 	});
 });
 
-export const handle: Handle = handleParaglide;
+export const handle: Handle = (input) =>
+	input.event.url.pathname.startsWith('/img/') ? input.resolve(input.event) : handleParaglide(input);

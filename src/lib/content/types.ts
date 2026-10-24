@@ -1,14 +1,21 @@
+export type ImageAsset = {
+	id: string;
+	alt: string;
+	width: number | null;
+	height: number | null;
+	version: string | null;
+	vector: boolean;
+};
+
 export type GalleryImage = {
 	id: string;
-	src: string;
-	alt: string;
+	image: ImageAsset;
 	caption: string | null;
 };
 
 export type IconItem = {
 	id: string;
-	src: string | null;
-	alt: string;
+	image: ImageAsset | null;
 	title: string | null;
 	content: string | null;
 };
@@ -75,9 +82,11 @@ export type HeroBlock = {
 	id: string;
 	type: 'hero';
 	content: string | null;
-	image: { src: string; alt: string } | null;
+	image: ImageAsset | null;
 	imageConstraint: 'height' | 'width';
 	imageMax: number | null;
+	background: ImageAsset | null;
+	backgroundFade: boolean;
 	links: HeroLink[];
 };
 
@@ -88,7 +97,7 @@ export type ImageMapBlock = {
 	type: 'imagemap';
 	title: string | null;
 	content: string | null;
-	image: { src: string; alt: string; width: number; height: number } | null;
+	image: (ImageAsset & { width: number; height: number }) | null;
 	areas: ImageMapArea[];
 };
 

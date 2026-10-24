@@ -3,6 +3,7 @@
 	import { resolve } from '$app/paths';
 	import { localizeHref } from '#lib/paraglide/runtime.js';
 	import type { ImageMapBlock } from '#lib/content/types.ts';
+	import Image from '../Image.svelte';
 	import BlockSection from './BlockSection.svelte';
 
 	let { title, content, image, areas }: Pick<ImageMapBlock, 'title' | 'content' | 'image' | 'areas'> = $props();
@@ -37,7 +38,7 @@
 	{#if image}
 		<div class="map mx-auto w-full" {@attach entryProgress}>
 			<div class="map-scale relative">
-				<img class="block h-auto w-full" src={image.src} alt={image.alt} width={image.width} height={image.height} />
+				<Image class="block h-auto w-full" {image} sizes="min(100vw, 1024px)" />
 				<svg class="absolute inset-0 size-full" viewBox="0 0 {image.width} {image.height}">
 					{#each areas as area (area.id)}
 						<a
@@ -69,7 +70,7 @@
 		z-index: 0;
 	}
 
-	img {
+	.map-scale :global(img) {
 		box-shadow: 20px 0 20px 0 rgba(255, 255, 255, 0.30) inset, 0 -975px 250px 0 rgba(255, 255, 255, 0.00), 0 -624px 250px 0 rgba(255, 255, 255, 0.01), 0 -351px 211px 0 rgba(255, 255, 255, 0.05), 0 -156px 156px 0 rgba(255, 255, 255, 0.09), 0 -39px 86px 0 rgba(255, 255, 255, 0.10);
 		border-radius: 50%;
 	}
